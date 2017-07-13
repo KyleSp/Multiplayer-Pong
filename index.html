@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<!-- 
+	Made by Kyle Spurlock
+-->
+
+<html>
+<head>
+	<title>Multiplayer Pong</title>
+</head>
+<body>
+	<canvas id="mainCanvas" width="600", height="550" style="border:1px solid #000000;"></canvas>
+	
+	<p id="player"></p>
+	
+	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="/static/javascript.js"></script>
+	
+	<script>
+		var socket = io.connect("http://localhost:3000");
+		
+		$(function () {
+			socket.on("player", function(num) {
+				$("#player").text(num);
+			});
+		});
+		
+		/*
+		$(function () {
+		//send messages
+			$("form").submit(function() {	//onclick event for form's button
+				socket.emit("chat message", $("#m").val());		//select "m" tag's value and put it on server's "chat message" variable
+				$("#m").val("");	//clear "m" tag's value (clear textbox)
+				return false;
+			});
+
+			//get messages
+			socket.on("chat message", function(msg) {
+				$("#messages").append($("<li>").text(msg));		//write message to window
+			});
+		});
+		*/
+	
+	</script>
+	
+</body>
+</html>
