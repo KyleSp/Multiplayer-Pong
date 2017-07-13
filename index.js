@@ -1,9 +1,17 @@
+/*
+	Made by Kyle Spurlock
+*/
+
+//SERVER
+
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 
-var numPlayers = 0;
+//var numPlayers = 0;
+var leftMovement = 550 / 2 - 100 / 2;
+var rightMovement = 550 / 2 - 100 / 2;
 
 app.use("/static", express.static("public"));
 
@@ -19,6 +27,7 @@ io.on("connection", function(socket) {
 	io.emit("player", numPlayers);
 	
 	socket.on("disconnect", function() {
+		--numPlayers;
 		console.log("user disconnected");
 	});
 	
@@ -29,6 +38,11 @@ io.on("connection", function(socket) {
 	});
 	*/
 })
+
+setInterval(function() {
+	io.emit("leftMovement", leftMovement);
+	io.emit("rightMovement", rightMovement);
+}, 10);
 
 http.listen(3000, function() {
 	console.log("listening on *:3000");

@@ -11,20 +11,49 @@
 <body>
 	<canvas id="mainCanvas" width="600", height="550" style="border:1px solid #000000;"></canvas>
 	
-	<p id="player"></p>
+	<script>
+		//global client variables
+		var socket;
+		var numPlayers = 0;
+		//var leftMovement;
+		//var rightMovement;
+	</script>
 	
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 	<script src="/static/javascript.js"></script>
 	
 	<script>
-		var socket = io.connect("http://localhost:3000");
+		socket = io.connect("http://localhost:3000");
 		
-		$(function () {
+		$(function() {
+			socket.on("player", function(num) {
+				numPlayers = num;
+			});
+		});
+		
+		/*
+		$(function() {
 			socket.on("player", function(num) {
 				$("#player").text(num);
 			});
+			
+			//get movements from server
+			socket.on("leftMovement", function(left) {
+				$("#leftMovement").text(left);
+			});
+			
+			socket.on("rightMovement", function(right) {
+				$("#rightMovement").text(right);
+			});
+			
+			//set movements to server
+			setInterval(function() {
+				socket.emit("leftMovement", $("#leftMovement").val());
+				socket.emit("rightMovement", $("#rightMovement").val());
+			}, 10);
 		});
+		*/
 		
 		/*
 		$(function () {
