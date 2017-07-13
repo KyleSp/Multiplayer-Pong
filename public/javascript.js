@@ -5,6 +5,7 @@
 var canvas = document.getElementById("mainCanvas");
 var ctx = canvas.getContext("2d");
 
+
 //constants
 
 const WIDTH = canvas.width;
@@ -48,6 +49,10 @@ class Ball {
 //global variables
 var plrLeft = new Player(true);
 var plrRight = new Player(false);
+var plrNum;
+
+//get player number
+plrNum = 
 
 //run game loop
 var intervalID = setInterval(game, 10);
