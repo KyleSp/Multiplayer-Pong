@@ -55,23 +55,31 @@ class Player {
 				//output to html
 				if (this.isLeft) {
 					//output left's movement
-					leftMovement.innerHTML = this.locY;
+					socket.emit("leftMovement", this.locY);
+					//leftMovement.innerHTML = this.locY;
 				} else {
 					//output right's movement
-					rightMovement.innerHTML = this.locY;
+					socket.emit("rightMovement", this.locY);
+					//rightMovement.innerHTML = this.locY;
 				}
 			}
 		} else {
-			/*
 			//get movements from server
 			if (this.isLeft) {
 				//get left's movement
-				this.locY = parseInt(leftMovement.textContent);
+				//console.log("get left");
+				socket.on("leftMovement", function(left) {
+					this.locY = left;
+				});
+				//this.locY = parseInt(leftMovement.textContent);
 			} else {
 				//get right's movement
-				this.locY = parseInt(rightMovement.textContent);
+				//console.log("get right");
+				socket.on("rightMovement", function(right) {
+					this.locY = right;
+				});
+				//this.locY = parseInt(rightMovement.textContent);
 			}
-			*/
 		}
 	}
 }
@@ -83,24 +91,42 @@ class Ball {
 }
 
 //global variables
+var plrNum;
+var plrNum2 = 0;
+socket.on("player", function(num) {
+	plrNum = num;
+});
 
-var plrNum = parseInt(numPlayerText.textContent);
-//var plrLeft = new Player(true, plrNum == 1);
-var plrLeft = new Player(true, true);
-var plrRight = new Player(false, plrNum == 2);
+var plrLeft = new Player(true, false);
+var plrRight = new Player(false, false);
 
 var upPressed = false;
 var downPressed = false;
 
 //run game loop
-var intervalID = setInterval(game, 10);
+var gameIntervalID = setInterval(game, 10);
 
 //functions
 
 function game() {
+	//assign players correctly
+	if (plrNum > 0 && plrNum2 == 0) {
+		plrNum2 = plrNum;
+		
+		if (plrNum == 1) {
+			plrLeft.isControlled = true;
+			plrRight.isControlled = false;
+		} else if (plrNum == 2) {
+			plrRight.isControlled = true;
+			plrLeft.isControlled = false;
+		}
+	}
+	
 	//update
 	plrLeft.movement();
 	plrRight.movement();
+	
+	//console.log(plrLeft.locY + "\t" + plrRight.locY);
 	
 	//draw
 	draw();
@@ -117,9 +143,6 @@ function draw() {
 	//right paddle
 	ctx.fillStyle = "#0000FF";
 	ctx.fillRect(plrRight.locX, plrRight.locY, plrRight.sizeX, plrRight.sizeY);
-	
-	//console.log("leftX: " + plrLeft.locX);
-	//console.log("leftY: " + plrLeft.locY);
 	
 }
 

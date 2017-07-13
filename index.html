@@ -11,26 +11,25 @@
 <body>
 	<canvas id="mainCanvas" width="600", height="550" style="border:1px solid #000000;"></canvas>
 	
-	<script>
-		//global client variables
-		var socket;
-		var numPlayers = 0;
-		//var leftMovement;
-		//var rightMovement;
-	</script>
-	
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-	<script src="/static/javascript.js"></script>
 	
 	<script>
-		socket = io.connect("http://localhost:3000");
+		//global client variables
+		var socket = io.connect("http://localhost:3000");
 		
+		/*
 		$(function() {
 			socket.on("player", function(num) {
 				numPlayers = num;
 			});
 		});
+		*/
+	</script>
+	
+	<script src="/static/javascript.js"></script>
+	
+	<script>
 		
 		/*
 		$(function() {
@@ -47,7 +46,7 @@
 				$("#rightMovement").text(right);
 			});
 			
-			//set movements to server
+			//send movements to server
 			setInterval(function() {
 				socket.emit("leftMovement", $("#leftMovement").val());
 				socket.emit("rightMovement", $("#rightMovement").val());

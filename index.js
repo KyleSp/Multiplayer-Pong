@@ -9,7 +9,7 @@ var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 
-//var numPlayers = 0;
+var numPlayers = 0;
 var leftMovement = 550 / 2 - 100 / 2;
 var rightMovement = 550 / 2 - 100 / 2;
 
@@ -24,11 +24,27 @@ io.on("connection", function(socket) {
 	
 	++numPlayers;
 	
+	app.get("/", function(req, res){
+		res.sendFile(__dirname + "/index.html");
+	});
+	
 	io.emit("player", numPlayers);
 	
 	socket.on("disconnect", function() {
 		--numPlayers;
 		console.log("user disconnected");
+	});
+	
+	socket.on("rightMovement", function(value) {
+		//console.log("right movement update");
+		rightMovement = value;
+		io.emit("rightMovement", value);
+	});
+	
+	socket.on("leftMovement", function(value) {
+		//console.log("left movement update");
+		leftMovement = value;
+		io.emit("leftMovement", value);
 	});
 	
 	/*
@@ -39,10 +55,24 @@ io.on("connection", function(socket) {
 	*/
 })
 
+/*
 setInterval(function() {
 	io.emit("leftMovement", leftMovement);
 	io.emit("rightMovement", rightMovement);
 }, 10);
+*/
+
+/*
+io.on("leftMovement", function(value) {
+	console.log("update left");
+	leftMovement = value;
+});
+
+io.on("rightMovement", function(value) {
+	console.log("update right");
+	rightMovement = value;
+});
+*/
 
 http.listen(3000, function() {
 	console.log("listening on *:3000");
