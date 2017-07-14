@@ -17,60 +17,8 @@
 	<script>
 		//global client variables
 		var socket = io.connect("http://localhost:3000");
-		
-		/*
-		$(function() {
-			socket.on("player", function(num) {
-				numPlayers = num;
-			});
-		});
-		*/
 	</script>
 	
 	<script src="/static/javascript.js"></script>
-	
-	<script>
-		
-		/*
-		$(function() {
-			socket.on("player", function(num) {
-				$("#player").text(num);
-			});
-			
-			//get movements from server
-			socket.on("leftMovement", function(left) {
-				$("#leftMovement").text(left);
-			});
-			
-			socket.on("rightMovement", function(right) {
-				$("#rightMovement").text(right);
-			});
-			
-			//send movements to server
-			setInterval(function() {
-				socket.emit("leftMovement", $("#leftMovement").val());
-				socket.emit("rightMovement", $("#rightMovement").val());
-			}, 10);
-		});
-		*/
-		
-		/*
-		$(function () {
-		//send messages
-			$("form").submit(function() {	//onclick event for form's button
-				socket.emit("chat message", $("#m").val());		//select "m" tag's value and put it on server's "chat message" variable
-				$("#m").val("");	//clear "m" tag's value (clear textbox)
-				return false;
-			});
-
-			//get messages
-			socket.on("chat message", function(msg) {
-				$("#messages").append($("<li>").text(msg));		//write message to window
-			});
-		});
-		*/
-	
-	</script>
-	
 </body>
 </html>

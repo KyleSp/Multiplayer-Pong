@@ -16,13 +16,14 @@ const HEIGHT = canvas.height;
 
 const PLR_SIZE_X = 50;
 const PLR_SIZE_Y = 100;
-
 const PLR_GAP = 50;
-
 const PLR_LEFT_LOC_X = PLR_GAP;
 const PLR_RIGHT_LOC_X = WIDTH - (PLR_SIZE_X + PLR_GAP);
+const PLR_SPEED = 3;
 
-const PLR_VELOCITY = 3;
+const BALL_RADIUS = 20;
+const BALL_CENTER_X =  BALL_RADIUS + WIDTH / 2;
+const BALL_CENTER_Y =  BALL_RADIUS + HEIGHT / 2;
 
 //classes
 
@@ -55,7 +56,6 @@ class Player {
 					console.log("socket get left: " + left);
 					this.locY = left;
 					leftLocY = left;
-					console.log("locY: " + this.locY);
 				});
 			} else {
 				console.log("is right");
@@ -65,7 +65,6 @@ class Player {
 					console.log("socket get right: " + right);
 					this.locY = right;
 					rightLocY = right;
-					console.log("locY: " + this.locY);
 				});
 			}
 		} else {
@@ -77,10 +76,20 @@ class Player {
 		if (this.isControlled) {
 			//make movements
 			if (!(upPressed && downPressed)) {
-				if (upPressed) {
-					this.locY -= PLR_VELOCITY;
+				if (upPressed ) {
+					this.locY -= PLR_SPEED;
+					
+					//stay in bounds
+					if (this.locY < 0) {
+						this.locY = 0;
+					}
 				} else if (downPressed) {
-					this.locY += PLR_VELOCITY;
+					this.locY += PLR_SPEED;
+					
+					//stay in bounds
+					if (this.locY > HEIGHT - this.sizeY) {
+						this.locY = HEIGHT - this.sizeY;
+					}
 				}
 				
 				//output to server
@@ -93,32 +102,25 @@ class Player {
 				}
 			}
 		}
-		/*
-		else {
-			//get movements from server
-			if (this.isLeft) {
-				//get left's movement
-				//console.log("get left");
-				socket.on("leftMovement", function(left) {
-					this.locY = left;
-				});
-				//this.locY = parseInt(leftMovement.textContent);
-			} else {
-				//get right's movement
-				//console.log("get right");
-				socket.on("rightMovement", function(right) {
-					this.locY = right;
-				});
-				//this.locY = parseInt(rightMovement.textContent);
-			}
-		}
-		*/
 	}
 }
 
 class Ball {
 	constructor() {
+		this.radius = BALL_RADIUS;
+		this.locX = BALL_CENTER_X;
+		this.locY = BALL_CENTER_Y;
 		
+		//get movements from server
+		socket.on("ballLocX", function(x) {
+			this.locX = x;
+			ballLocX = x;
+		});
+		
+		socket.on("ballLocY", function(y) {
+			this.locY = y;
+			ballLocY = y;
+		});
 	}
 }
 
@@ -135,6 +137,12 @@ var downPressed = false;
 
 var leftLocY = HEIGHT / 2 - PLR_SIZE_Y / 2;
 var rightLocY = HEIGHT / 2 - PLR_SIZE_Y / 2;
+var ballLocX = BALL_CENTER_X;
+var ballLocY = BALL_CENTER_Y;
+
+var plrLeft;
+var plrRight;
+var ball = new Ball();
 
 //run game loop
 var gameIntervalID = setInterval(game, 10);
@@ -166,7 +174,8 @@ function game() {
 			plrRight.locY = rightLocY;
 		}
 		
-		console.log(plrLeft.locY + "\t" + plrRight.locY);
+		ball.locX = ballLocX;
+		ball.locY = ballLocY;
 		
 		//draw
 		draw();
@@ -185,6 +194,12 @@ function draw() {
 	ctx.fillStyle = "#0000FF";
 	ctx.fillRect(plrRight.locX, plrRight.locY, plrRight.sizeX, plrRight.sizeY);
 	
+	//ball
+	ctx.fillStyle = "#FF0000";
+	ctx.beginPath();
+	ctx.arc(ball.locX, ball.locY, ball.radius, 0, 2 * Math.PI, false);
+	ctx.fill();
+	ctx.closePath();
 }
 
 function keyDown(evt) {
