@@ -22,16 +22,19 @@ const PLR_GAP = 50;
 const PLR_LEFT_LOC_X = PLR_GAP;
 const PLR_RIGHT_LOC_X = WIDTH - (PLR_SIZE_X + PLR_GAP);
 
-const PLR_VELOCITY = 1;
+const PLR_VELOCITY = 3;
 
 //classes
 
 class Player {
 	constructor(isLeft, isControlled) {
+		this.isLeft = isLeft;
+		this.isControlled = isControlled;
+		
 		this.sizeX = PLR_SIZE_X;
 		this.sizeY = PLR_SIZE_Y;
 		
-		this.isControlled = isControlled;
+		console.log("isControlled: " + isControlled);
 		
 		if (isLeft) {
 			this.locX = PLR_LEFT_LOC_X;
@@ -40,6 +43,34 @@ class Player {
 		}
 		
 		this.locY = HEIGHT / 2 - this.sizeY / 2;
+		
+		//get movements from server
+		if (!this.isControlled) {
+			console.log("not controlled");
+			if (this.isLeft) {
+				console.log("is left");
+				//get left's movement
+				console.log("get left");
+				socket.on("leftMovement", function(left) {
+					console.log("socket get left: " + left);
+					this.locY = left;
+					leftLocY = left;
+					console.log("locY: " + this.locY);
+				});
+			} else {
+				console.log("is right");
+				//get right's movement
+				console.log("get right");
+				socket.on("rightMovement", function(right) {
+					console.log("socket get right: " + right);
+					this.locY = right;
+					rightLocY = right;
+					console.log("locY: " + this.locY);
+				});
+			}
+		} else {
+			console.log("controlled");
+		}
 	}
 	
 	movement() {
@@ -52,18 +83,18 @@ class Player {
 					this.locY += PLR_VELOCITY;
 				}
 				
-				//output to html
+				//output to server
 				if (this.isLeft) {
 					//output left's movement
 					socket.emit("leftMovement", this.locY);
-					//leftMovement.innerHTML = this.locY;
 				} else {
 					//output right's movement
 					socket.emit("rightMovement", this.locY);
-					//rightMovement.innerHTML = this.locY;
 				}
 			}
-		} else {
+		}
+		/*
+		else {
 			//get movements from server
 			if (this.isLeft) {
 				//get left's movement
@@ -81,6 +112,7 @@ class Player {
 				//this.locY = parseInt(rightMovement.textContent);
 			}
 		}
+		*/
 	}
 }
 
@@ -93,15 +125,16 @@ class Ball {
 //global variables
 var plrNum;
 var plrNum2 = 0;
+
 socket.on("player", function(num) {
 	plrNum = num;
 });
 
-var plrLeft = new Player(true, false);
-var plrRight = new Player(false, false);
-
 var upPressed = false;
 var downPressed = false;
+
+var leftLocY = HEIGHT / 2 - PLR_SIZE_Y / 2;
+var rightLocY = HEIGHT / 2 - PLR_SIZE_Y / 2;
 
 //run game loop
 var gameIntervalID = setInterval(game, 10);
@@ -111,25 +144,33 @@ var gameIntervalID = setInterval(game, 10);
 function game() {
 	//assign players correctly
 	if (plrNum > 0 && plrNum2 == 0) {
+		console.log("assign players correctly");
 		plrNum2 = plrNum;
 		
-		if (plrNum == 1) {
-			plrLeft.isControlled = true;
-			plrRight.isControlled = false;
-		} else if (plrNum == 2) {
-			plrRight.isControlled = true;
-			plrLeft.isControlled = false;
-		}
+		console.log("player left:");
+		plrLeft = new Player(true, plrNum == 1);
+		console.log("player right:");
+		plrRight = new Player(false, plrNum == 2);
 	}
 	
-	//update
-	plrLeft.movement();
-	plrRight.movement();
-	
-	//console.log(plrLeft.locY + "\t" + plrRight.locY);
-	
-	//draw
-	draw();
+	if (plrNum2 != 0) {
+		//update
+		plrLeft.movement();
+		plrRight.movement();
+		
+		if (!plrLeft.isControlled) {
+			plrLeft.locY = leftLocY;
+		}
+		
+		if (!plrRight.isControlled) {
+			plrRight.locY = rightLocY;
+		}
+		
+		console.log(plrLeft.locY + "\t" + plrRight.locY);
+		
+		//draw
+		draw();
+	}
 }
 
 function draw() {
